@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self'; script-src 'self'"
+    />
+    <title>ClearCue Prompt</title>
+    <link rel="stylesheet" href="prompter.css" />
+  </head>
+  <body>
+    <div class="prompter-shell" id="shell">
+      <div class="drag-strip" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="eye-line" aria-hidden="true"></div>
+      <div class="viewport" id="viewport">
+        <article id="content"></article>
+      </div>
+      <div class="paused-badge" id="paused">PAUSED</div>
+      <div class="manual-hint">SCROLL OR USE ↑ / ↓</div>
+    </div>
+    <script src="prompter.js"></script>
+  </body>
+</html>

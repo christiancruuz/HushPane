@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self'; script-src 'self'"
+    />
+    <title>ClearCue Controls</title>
+    <link rel="stylesheet" href="controller.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <div>
+          <p class="eyebrow">LOCAL TELEPROMPTER</p>
+          <h1>ClearCue</h1>
+        </div>
+        <div class="status" id="status">
+          <span class="status-dot"></span>
+          <span>Prompt ready</span>
+        </div>
+      </header>
+
+      <section class="notice">
+        <strong>Share a window or browser tab.</strong>
+        <span>Do not share your entire screen if the prompt must stay private.</span>
+      </section>
+
+      <section class="script-section">
+        <div class="section-heading">
+          <label for="script">Your script</label>
+          <span id="word-count">0 words</span>
+        </div>
+        <textarea
+          id="script"
+          spellcheck="true"
+          aria-label="Teleprompter script"
+        ></textarea>
+      </section>
+
+      <section class="transport" aria-label="Playback controls">
+        <button class="primary" id="play" type="button">Start prompting</button>
+        <button class="secondary" id="reset" type="button">Reset</button>
+        <button class="icon-button" id="visibility" type="button">Hide prompt</button>
+      </section>
+
+      <section class="settings">
+        <div class="slider-row">
+          <div>
+            <label for="speed">Scroll speed</label>
+            <output id="speed-value">34 px/s</output>
+          </div>
+          <input id="speed" type="range" min="4" max="120" value="34" />
+        </div>
+
+        <div class="slider-row">
+          <div>
+            <label for="font-size">Text size</label>
+            <output id="font-size-value">44 px</output>
+          </div>
+          <input id="font-size" type="range" min="24" max="84" value="44" />
+        </div>
+
+        <div class="slider-row">
+          <div>
+            <label for="opacity">Background</label>
+            <output id="opacity-value">82%</output>
+          </div>
+          <input id="opacity" type="range" min="20" max="100" value="82" />
+        </div>
+
+        <div class="toggle-grid">
+          <label class="toggle-card">
+            <span>
+              <strong>Click-through mode</strong>
+              <small>Disables mouse scrolling when enabled</small>
+            </span>
+            <input id="click-through" type="checkbox" />
+          </label>
+
+          <label class="toggle-card">
+            <span>
+              <strong>Mirror text</strong>
+              <small>For physical teleprompter glass</small>
+            </span>
+            <input id="mirrored" type="checkbox" />
+          </label>
+        </div>
+      </section>
+
+      <footer>
+        <p><kbd>⌘/Ctrl</kbd> <kbd>Shift</kbd> <kbd>Space</kbd> Pause/resume</p>
+        <p><kbd>⌘/Ctrl</kbd> <kbd>Shift</kbd> <kbd>↑/↓</kbd> Change speed</p>
+        <p><kbd>⌘/Ctrl</kbd> <kbd>Shift</kbd> <kbd>H</kbd> Hide/show</p>
+      </footer>
+    </main>
+    <script src="controller.js"></script>
+  </body>
+</html>
