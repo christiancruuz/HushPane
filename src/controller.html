@@ -11,21 +11,44 @@
       content="default-src 'self'; style-src 'self'; script-src 'self'"
     />
     <title>ClearCue Controls</title>
+    <link rel="stylesheet" href="fonts.css" />
     <link rel="stylesheet" href="controller.css" />
   </head>
   <body>
+    <div class="rivets" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
     <main class="shell">
       <header>
-        <div>
-          <p class="eyebrow">LOCAL TELEPROMPTER</p>
-          <h1>ClearCue</h1>
+        <div class="brand-row">
+          <div>
+            <p class="eyebrow">LOCAL TELEPROMPTER</p>
+            <h1>ClearCue</h1>
+          </div>
+          <button
+            class="info-button"
+            id="about-open"
+            type="button"
+            aria-haspopup="dialog"
+            aria-expanded="false"
+            aria-controls="about"
+            aria-label="About ClearCue"
+            title="About ClearCue"
+          >
+            i
+          </button>
         </div>
         <div class="header-meta">
           <div class="status" id="status">
             <span class="status-dot"></span>
             <span>Prompt ready</span>
           </div>
-          <a class="coffee" href="https://buymeacoffee.com/kihongo">Buy me a coffee</a>
+          <button class="theme-toggle secondary" id="theme" type="button" aria-pressed="false">
+            Dark
+          </button>
         </div>
       </header>
 
@@ -97,11 +120,60 @@
       </section>
 
       <footer>
-        <p><kbd>⌘/Ctrl</kbd> <kbd>Shift</kbd> <kbd>Space</kbd> Pause/resume</p>
-        <p><kbd>⌘/Ctrl</kbd> <kbd>Shift</kbd> <kbd>↑/↓</kbd> Change speed</p>
-        <p><kbd>⌘/Ctrl</kbd> <kbd>Shift</kbd> <kbd>H</kbd> Hide/show</p>
+        <p><kbd>⌘<span class="slash">/</span>Ctrl</kbd> <kbd>Shift</kbd> <kbd>Space</kbd> Pause<span class="slash">/</span>resume</p>
+        <p><kbd>⌘<span class="slash">/</span>Ctrl</kbd> <kbd>Shift</kbd> <kbd>↑<span class="slash">/</span>↓</kbd> Change speed</p>
+        <p><kbd>⌘<span class="slash">/</span>Ctrl</kbd> <kbd>Shift</kbd> <kbd>H</kbd> Hide<span class="slash">/</span>show</p>
       </footer>
     </main>
+
+    <div class="about-backdrop" id="about-backdrop" hidden>
+      <div
+        class="about-panel"
+        id="about"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="about-title"
+      >
+        <div class="about-aurora" aria-hidden="true"></div>
+        <div class="about-head">
+          <div>
+            <p class="eyebrow">FROM THE MAKER</p>
+            <h2 id="about-title">About ClearCue</h2>
+          </div>
+          <button class="about-close" id="about-close" type="button">Close</button>
+        </div>
+        <div class="about-scroll">
+          <p>
+            I’m Christian, a software engineer and founder who loves building things that make everyday life a little easier. ClearCue started with a simple thought: I wanted tools like these to exist, so I made them and shared them.
+          </p>
+          <p>
+            If you like what I’ve built here, check out my main brainchild,
+            <a href="https://www.uni-ke.com/">Uni-ke</a>. It’s where I’m putting that same energy on a much bigger scale.
+          </p>
+          <p>
+            If ClearCue is useful to you, you can <a href="https://buymeacoffee.com/kihongo">buy me a coffee</a>.
+          </p>
+
+          <h3>Dressed like hardware</h3>
+          <ul class="vibe-row">
+            <li>Frutiger Aero</li>
+            <li>Cybercore</li>
+            <li>Y2K</li>
+          </ul>
+          <p>
+            The control deck looks like a gadget on purpose. Frutiger Aero is the glossy, hopeful half: sky-blue buttons, brushed metal, and the early-2000s idea that a tool could look friendly and still feel exact. Cybercore is the glass over the readout — scanlines, a status light, a screen already mid-task. Y2K is the posture: rivets, all-caps labels, and buttons chunky enough that pressing one feels deliberate.
+          </p>
+
+          <h3>Why I keep it open</h3>
+          <p>
+            I use ClearCue almost every time I pitch. The script sits near the camera and scrolls at a pace I can talk over, so the words stay in the corner of my eye while I stay with the person across the table or on the call. When the conversation turns, I pause it. When I need the next line, it is already waiting.
+          </p>
+          <p>
+            Share only the window or tab you are presenting and the prompt stays on your side of the screen. That is the whole trick. I get to sound like I know what I built, because I do, and I am not hunting through a notes app to prove it.
+          </p>
+        </div>
+      </div>
+    </div>
     <script src="controller.js"></script>
   </body>
 </html>

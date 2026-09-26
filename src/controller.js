@@ -13,6 +13,7 @@ const elements = {
   clickThrough: document.querySelector("#click-through"),
   mirrored: document.querySelector("#mirrored"),
   status: document.querySelector("#status"),
+  theme: document.querySelector("#theme"),
 };
 
 let currentState;
@@ -31,6 +32,7 @@ function saveState(state) {
       fontSize: state.fontSize,
       opacity: state.opacity,
       mirrored: state.mirrored,
+      theme: state.theme,
     }));
   }, 120);
 }
@@ -53,6 +55,14 @@ function render(state) {
   elements.status.lastElementChild.textContent = state.running
     ? "Prompt scrolling"
     : "Prompt ready";
+  const dark = state.theme === "dark";
+  document.documentElement.dataset.theme = dark ? "dark" : "light";
+  elements.theme.textContent = dark ? "Light" : "Dark";
+  elements.theme.setAttribute("aria-pressed", String(dark));
+  elements.theme.setAttribute(
+    "aria-label",
+    dark ? "Switch to light theme" : "Switch to dark theme",
+  );
   saveState(state);
 }
 
@@ -88,6 +98,61 @@ elements.clickThrough.addEventListener("change", () => {
 
 elements.mirrored.addEventListener("change", () => {
   window.clearCue.update({ mirrored: elements.mirrored.checked });
+});
+
+elements.theme.addEventListener("click", () => {
+  window.clearCue.update({ theme: currentState?.theme === "dark" ? "light" : "dark" });
+});
+
+const aboutBackdrop = document.querySelector("#about-backdrop");
+const aboutPanel = document.querySelector("#about");
+const aboutOpen = document.querySelector("#about-open");
+const aboutClose = document.querySelector("#about-close");
+
+function aboutFocusable() {
+  return [...aboutPanel.querySelectorAll("a[href], button:not([disabled])")];
+}
+
+function openAbout() {
+  aboutBackdrop.hidden = false;
+  document.body.classList.add("about-open");
+  aboutOpen.setAttribute("aria-expanded", "true");
+  aboutClose.focus();
+}
+
+function closeAbout() {
+  if (aboutBackdrop.hidden) return;
+  aboutBackdrop.hidden = true;
+  document.body.classList.remove("about-open");
+  aboutOpen.setAttribute("aria-expanded", "false");
+  aboutOpen.focus();
+}
+
+aboutOpen.addEventListener("click", openAbout);
+aboutClose.addEventListener("click", closeAbout);
+aboutBackdrop.addEventListener("click", (event) => {
+  if (event.target === aboutBackdrop) closeAbout();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (aboutBackdrop.hidden) return;
+  if (event.key === "Escape") {
+    event.preventDefault();
+    closeAbout();
+    return;
+  }
+  if (event.key !== "Tab") return;
+  const focusable = aboutFocusable();
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
 });
 
 window.clearCue.onState(render);

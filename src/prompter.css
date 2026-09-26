@@ -1,8 +1,10 @@
+/* ClearCue — Y2K metal bezel, LCD prompt */
+
 :root {
-  font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-  color: white;
+  --read-font: ui-sans-serif, system-ui, "Segoe UI", "Helvetica Neue", sans-serif;
+  font-family: "Y224", "Oxanium", sans-serif;
+  font-synthesis: none;
+  color: #e9f8ff;
 }
 
 * {
@@ -23,11 +25,27 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 18px;
-  background: rgba(5, 7, 12, var(--prompt-opacity, 0.82));
-  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.34);
+  border-radius: 16px;
+  background-color: rgba(13, 26, 44, var(--prompt-opacity, 0.82));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.72),
+    inset 0 0 0 8px #c5ccd4,
+    inset 0 0 0 9px #6a717a,
+    0 14px 32px rgba(0, 0, 0, 0.38);
   transition: background-color 120ms ease;
+}
+
+.prompter-shell::after {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  z-index: 2;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(150, 210, 255, 0.05) 0 1px,
+    transparent 1px 4px
+  );
 }
 
 .drag-strip {
@@ -37,18 +55,65 @@ body {
   left: 0;
   display: flex;
   width: 100%;
-  height: 24px;
+  height: 22px;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 6px;
   -webkit-app-region: drag;
 }
 
 .drag-strip span {
-  width: 3px;
-  height: 3px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.28);
+  background:
+    radial-gradient(circle at 35% 30%, #fff, #d5dbe2 40%, #6e757e 74%, #3a4048);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+}
+
+.hide-prompt {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, #fff 0 18%, transparent 20%),
+    linear-gradient(180deg, #f7f9fb 0%, #d5dbe2 46%, #8d959e 100%);
+  display: grid;
+  place-items: center;
+  color: #1a222c;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 2px 0 #5c656e,
+    0 0 0 1px rgba(0, 0, 0, 0.28);
+}
+
+.hide-prompt svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+
+.hide-prompt path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+}
+
+.hide-prompt:hover {
+  border-color: #ffd0d0;
+  background:
+    radial-gradient(circle at 32% 28%, #fff 0 18%, transparent 20%),
+    linear-gradient(180deg, #ffd4d4 0%, #e15a5a 48%, #9d2424 100%);
+  color: #3a0909;
 }
 
 .viewport {
@@ -64,7 +129,7 @@ body {
     black 76%,
     transparent 98%
   );
-  scrollbar-color: rgba(255, 255, 255, 0.24) transparent;
+  scrollbar-color: rgba(140, 206, 245, 0.55) transparent;
   scrollbar-width: thin;
   overscroll-behavior: contain;
 }
@@ -79,22 +144,23 @@ body {
 
 .viewport::-webkit-scrollbar-thumb {
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.24);
+  background: rgba(140, 206, 245, 0.55);
 }
 
 article {
   max-width: 23em;
   margin: 0 auto;
-  color: rgba(255, 255, 255, 0.97);
+  color: #f7fbff;
+  font-family: var(--read-font);
   font-size: var(--prompt-font-size, 44px);
-  font-weight: 680;
+  font-weight: 650;
   line-height: var(--prompt-line-height, 1.42);
-  letter-spacing: -0.025em;
+  letter-spacing: -0.02em;
   text-align: center;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   text-wrap: balance;
-  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.75);
+  text-shadow: 0 1px 2px rgba(0, 8, 18, 0.55);
 }
 
 .mirrored article {
@@ -105,47 +171,43 @@ article {
   position: absolute;
   z-index: 3;
   top: 48%;
-  right: 1.5%;
-  left: 1.5%;
+  right: 5%;
+  left: 5%;
   height: 1px;
   background: linear-gradient(
     to right,
-    rgba(120, 126, 255, 0),
-    rgba(120, 126, 255, 0.35) 8%,
-    rgba(120, 126, 255, 0.35) 92%,
-    rgba(120, 126, 255, 0)
+    transparent,
+    rgba(160, 220, 255, 0.12) 10%,
+    rgba(198, 236, 255, 0.7) 50%,
+    rgba(160, 220, 255, 0.12) 90%,
+    transparent
   );
+  box-shadow: none;
   pointer-events: none;
 }
 
-.paused-badge {
-  position: absolute;
-  z-index: 5;
-  right: 14px;
-  bottom: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  border-radius: 999px;
-  padding: 5px 8px;
-  background: rgba(255, 255, 255, 0.07);
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 9px;
-  font-weight: 750;
-  letter-spacing: 0.12em;
-}
-
+.paused-badge,
 .manual-hint {
   position: absolute;
   z-index: 5;
   bottom: 12px;
-  left: 14px;
-  border: 1px solid rgba(139, 143, 255, 0.2);
+  border: 1px solid rgba(160, 214, 245, 0.35);
   border-radius: 999px;
-  padding: 5px 8px;
-  background: rgba(112, 117, 242, 0.1);
-  color: rgba(205, 207, 255, 0.72);
+  padding: 4px 8px;
+  background: rgba(6, 14, 24, 0.72);
+  color: #b7e7ff;
   font-size: 9px;
-  font-weight: 750;
-  letter-spacing: 0.1em;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  box-shadow: inset 0 1px 0 rgba(180, 220, 255, 0.2);
+}
+
+.paused-badge {
+  right: 14px;
+}
+
+.manual-hint {
+  left: 14px;
   opacity: 0;
   transition: opacity 120ms ease;
 }
@@ -156,4 +218,13 @@ article {
 
 .running .paused-badge {
   opacity: 0;
+}
+
+[data-theme="dark"] .prompter-shell {
+  background-color: rgba(6, 12, 22, var(--prompt-opacity, 0.82));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.22),
+    inset 0 0 0 8px #2c3138,
+    inset 0 0 0 9px #121418,
+    0 14px 32px rgba(0, 0, 0, 0.55);
 }

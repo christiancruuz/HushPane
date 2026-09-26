@@ -9,6 +9,11 @@ const {
 } = require("electron");
 
 const SUPPORT_URL = "https://buymeacoffee.com/kihongo";
+const EXTERNAL_URLS = new Set([
+  SUPPORT_URL,
+  "https://www.uni-ke.com/",
+  "https://www.uni-ke.com",
+]);
 
 app.setName("ClearCue");
 app.setPath("userData", path.join(app.getPath("appData"), "ClearCue"));
@@ -27,6 +32,7 @@ const state = {
   running: false,
   visible: true,
   mirrored: false,
+  theme: "light",
 };
 
 function send(channel, payload) {
@@ -39,6 +45,11 @@ function send(channel, payload) {
 
 function broadcastState() {
   send("prompter:state", { ...state, clickThrough });
+}
+
+function syncControllerChrome() {
+  if (!controllerWindow || controllerWindow.isDestroyed()) return;
+  controllerWindow.setBackgroundColor(state.theme === "dark" ? "#14161a" : "#c5cad1");
 }
 
 function pinPrompterAboveFullscreen() {
@@ -127,11 +138,11 @@ function createPrompterWindow() {
 function createControllerWindow() {
   controllerWindow = new BrowserWindow({
     width: 520,
-    height: 760,
+    height: 920,
     minWidth: 430,
-    minHeight: 600,
+    minHeight: 680,
     title: "ClearCue Controls",
-    backgroundColor: "#0b0d12",
+    backgroundColor: "#c5cad1",
     show: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -159,12 +170,12 @@ function createControllerWindow() {
 
 function openSupportLinksExternally(contents) {
   contents.setWindowOpenHandler(({ url }) => {
-    if (url === SUPPORT_URL) shell.openExternal(url);
+    if (EXTERNAL_URLS.has(url)) shell.openExternal(url);
     return { action: "deny" };
   });
 
   contents.on("will-navigate", (event, url) => {
-    if (url !== SUPPORT_URL) return;
+    if (!EXTERNAL_URLS.has(url)) return;
     event.preventDefault();
     shell.openExternal(url);
   });
@@ -213,6 +224,9 @@ ipcMain.on("prompter:update", (_event, patch) => {
   for (const key of allowed) {
     if (Object.hasOwn(patch, key)) state[key] = patch[key];
   }
+
+  if (patch.theme === "light" || patch.theme === "dark") state.theme = patch.theme;
+  syncControllerChrome();
 
   if (Object.hasOwn(patch, "visible")) {
     if (state.visible) showPrompter();

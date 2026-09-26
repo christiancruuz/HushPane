@@ -24,6 +24,7 @@ function applyState(nextState) {
   shell.classList.toggle("running", state.running);
   shell.classList.toggle("mirrored", state.mirrored);
   shell.classList.toggle("interactive", !state.clickThrough);
+  document.documentElement.dataset.theme = state.theme === "dark" ? "dark" : "light";
 }
 
 function reset() {
@@ -55,6 +56,10 @@ function animate(timestamp) {
 
 window.clearCue.onState(applyState);
 window.clearCue.onReset(reset);
+
+document.querySelector("#hide").addEventListener("click", () => {
+  window.clearCue.update({ visible: false });
+});
 
 viewport.addEventListener("wheel", (event) => {
   if (state.running) window.clearCue.update({ running: false });

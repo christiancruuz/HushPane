@@ -11,12 +11,20 @@
       content="default-src 'self'; style-src 'self'; script-src 'self'"
     />
     <title>ClearCue Prompt</title>
+    <link rel="stylesheet" href="fonts.css" />
     <link rel="stylesheet" href="prompter.css" />
   </head>
   <body>
     <div class="prompter-shell" id="shell">
-      <div class="drag-strip" aria-hidden="true">
-        <span></span><span></span><span></span>
+      <div class="drag-strip">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <button class="hide-prompt" id="hide" type="button" aria-label="Hide prompt">
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M4 4 L12 12 M12 4 L4 12" />
+          </svg>
+        </button>
       </div>
       <div class="eye-line" aria-hidden="true"></div>
       <div class="viewport" id="viewport">
