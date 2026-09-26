@@ -1,12 +1,12 @@
-# ClearCue Invisible Teleprompter
+# HushPane Invisible Teleprompter
 
-ClearCue is a local Electron teleprompter with a transparent, always-on-top
+HushPane is a local Electron teleprompter with a transparent, always-on-top
 overlay. It is designed to remain private when you share a specific application
 window or browser tab in Zoom, Google Meet, Teams, and similar tools.
 
 ## Run
 
-On this Mac, double-click **Launch ClearCue.command**. For development on any
+On this Mac, double-click **Launch HushPane.command**. For development on any
 supported desktop platform, install Node.js 22.12 or newer and run:
 
 ```bash
@@ -16,11 +16,11 @@ npm start
 
 ## During a call
 
-1. Open your presentation and ClearCue.
+1. Open your presentation and HushPane.
 2. In the meeting app, choose **Share window**, **Share application**, or
    **Share tab**.
 3. Select only the presentation—not the whole desktop.
-4. Paste your script into the ClearCue control window and press
+4. Paste your script into the HushPane control window and press
    **Start prompting**.
 
 The prompt stays stacked above native fullscreen windows, such as a slideshow
@@ -54,5 +54,5 @@ important presentation.
 
 ## Support
 
-ClearCue is free. If it helps you, you can
+HushPane is free. If it helps you, you can
 [buy me a coffee](https://buymeacoffee.com/kihongo).

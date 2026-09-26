@@ -15,8 +15,8 @@ const EXTERNAL_URLS = new Set([
   "https://www.uni-ke.com",
 ]);
 
-app.setName("ClearCue");
-app.setPath("userData", path.join(app.getPath("appData"), "ClearCue"));
+app.setName("HushPane");
+app.setPath("userData", path.join(app.getPath("appData"), "HushPane"));
 
 let controllerWindow;
 let prompterWindow;
@@ -24,7 +24,7 @@ let clickThrough = false;
 let pinTimer;
 
 const state = {
-  text: "Welcome to ClearCue.\n\nPaste your script into the control window, position this prompt near your camera, and share only your presentation window or browser tab.\n\nUse the global shortcut to pause or resume while another app is focused.",
+  text: "Welcome to HushPane.\n\nPaste your script into the control window, position this prompt near your camera, and share only your presentation window or browser tab.\n\nUse the global shortcut to pause or resume while another app is focused.",
   speed: 34,
   fontSize: 44,
   opacity: 82,
@@ -141,7 +141,7 @@ function createControllerWindow() {
     height: 920,
     minWidth: 430,
     minHeight: 680,
-    title: "ClearCue Controls",
+    title: "HushPane Controls",
     backgroundColor: "#c5cad1",
     show: false,
     webPreferences: {

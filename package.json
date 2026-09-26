@@ -1,6 +1,6 @@
 {
   "name": "invisible-teleprompter",
-  "productName": "ClearCue",
+  "productName": "HushPane",
   "version": "1.0.0",
   "description": "A local floating teleprompter designed for window and tab sharing.",
   "main": "src/main.js",
@@ -17,8 +17,8 @@
     "electron-builder": "^26.15.3"
   },
   "build": {
-    "appId": "com.kihongo.clearcue",
-    "productName": "ClearCue",
+    "appId": "com.kihongo.hushpane",
+    "productName": "HushPane",
     "files": [
       "src/**/*",
       "package.json"
@@ -36,7 +36,7 @@
       "notarize": true
     },
     "dmg": {
-      "title": "ClearCue"
+      "title": "HushPane"
     }
   }
 }
