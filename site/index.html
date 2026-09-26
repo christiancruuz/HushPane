@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClearCue — free teleprompter</title>
+    <meta
+      name="description"
+      content="ClearCue is a free floating teleprompter. The script stays on your screen when you share a window or browser tab."
+    />
+    <link rel="icon" href="icon.png" />
+    <style>
+      @font-face {
+        font-family: "Y224";
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url("fonts/Y224.ttf") format("truetype");
+      }
+
+      @font-face {
+        font-family: "Oxanium";
+        font-style: normal;
+        font-weight: 400 700;
+        font-display: swap;
+        src: url("fonts/oxanium-latin-ext.woff2") format("woff2");
+        unicode-range:
+          U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+          U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+          U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+      }
+
+      @font-face {
+        font-family: "Oxanium";
+        font-style: normal;
+        font-weight: 400 700;
+        font-display: swap;
+        src: url("fonts/oxanium-latin.woff2") format("woff2");
+        unicode-range:
+          U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+          U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+          U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+
+      :root {
+        --ink: #1c2430;
+        --muted: #5c6774;
+        --lcd: #0d1a2c;
+        --lcd-text: #d7f4ff;
+        --lcd-dim: rgba(186, 224, 242, 0.68);
+        --metal-hi: #f4f6f8;
+        --metal-mid: #c5cad1;
+        --metal-lo: #8e959e;
+        --read-font:
+          ui-sans-serif, system-ui, "Segoe UI", "Helvetica Neue", sans-serif;
+        color-scheme: light;
+        font-family: "Y224", "Oxanium", sans-serif;
+        font-synthesis: none;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        background:
+          radial-gradient(
+            circle at 12% 18%,
+            rgba(255, 255, 255, 0.7),
+            transparent 22%
+          ),
+          radial-gradient(
+            circle at 82% 8%,
+            rgba(186, 232, 255, 0.9),
+            transparent 26%
+          ),
+          radial-gradient(
+            circle at 70% 88%,
+            rgba(190, 240, 210, 0.75),
+            transparent 28%
+          ),
+          linear-gradient(180deg, #d7f3ff 0%, #8fd4f5 42%, #b7e7c8 100%);
+      }
+
+      .sky {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            circle at 20% 80%,
+            rgba(255, 255, 255, 0.55),
+            transparent 18%
+          ),
+          radial-gradient(
+            circle at 88% 62%,
+            rgba(255, 255, 255, 0.45),
+            transparent 14%
+          );
+      }
+
+      .deck {
+        position: relative;
+        width: min(100% - 32px, 640px);
+        margin: 48px auto;
+        padding: 18px 22px 22px;
+        border: 1px solid rgba(255, 255, 255, 0.72);
+        border-radius: 18px;
+        background:
+          linear-gradient(115deg, rgba(255, 255, 255, 0.45), transparent 28%),
+          repeating-linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.05) 0 1px,
+            transparent 1px 3px
+          ),
+          linear-gradient(
+            180deg,
+            var(--metal-hi) 0%,
+            var(--metal-mid) 42%,
+            var(--metal-lo) 100%
+          );
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.9),
+          0 22px 40px rgba(20, 50, 70, 0.28);
+      }
+
+      .aurora {
+        height: 7px;
+        margin: -18px -22px 16px;
+        border-radius: 18px 18px 0 0;
+        background: linear-gradient(
+          90deg,
+          #5eb6ef 0%,
+          #d9f6ff 28%,
+          #b8f3d2 58%,
+          #f7e7a8 78%,
+          #7ec8f5 100%
+        );
+      }
+
+      .rivet {
+        position: absolute;
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 35% 30%,
+          #fff 0 12%,
+          #d5dae0 13% 42%,
+          #6e757e 70%,
+          #3e444c
+        );
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.8),
+          0 1px 1px rgba(0, 0, 0, 0.45);
+      }
+
+      .rivet:nth-child(2) {
+        top: 12px;
+        left: 12px;
+      }
+      .rivet:nth-child(3) {
+        top: 12px;
+        right: 12px;
+      }
+      .rivet:nth-child(4) {
+        bottom: 12px;
+        left: 12px;
+      }
+      .rivet:nth-child(5) {
+        bottom: 12px;
+        right: 12px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .brand img {
+        width: 84px;
+        height: 84px;
+        border-radius: 18px;
+        filter: drop-shadow(0 8px 10px rgba(20, 40, 60, 0.28));
+      }
+
+      .eyebrow {
+        margin: 0 0 4px;
+        color: var(--muted);
+        font-size: 11px;
+        letter-spacing: 0.14em;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 34px;
+        font-weight: 400;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        background-image: linear-gradient(
+          180deg,
+          #d5e0ea 0%,
+          #6d8296 12%,
+          #243444 30%,
+          #8fa6ba 42%,
+          #ffffff 49%,
+          #c5d4e2 54%,
+          #3a4e62 68%,
+          #1a2633 100%
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.85))
+          drop-shadow(0 1px 1px rgba(10, 16, 24, 0.55));
+      }
+
+      .status {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        margin-top: 8px;
+        padding: 3px 8px 3px 7px;
+        border-radius: 999px;
+        background: var(--lcd);
+        color: var(--lcd-text);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        box-shadow:
+          inset 0 2px 4px rgba(0, 0, 0, 0.45),
+          0 1px 0 rgba(255, 255, 255, 0.45);
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 35% 30%,
+          #fff,
+          #9dffb8 40%,
+          #1fa85a
+        );
+        box-shadow: 0 0 6px rgba(60, 220, 120, 0.85);
+      }
+
+      .lcd {
+        margin-top: 18px;
+        padding: 14px 16px;
+        border: 1px solid #070d16;
+        border-radius: 8px;
+        background:
+          repeating-linear-gradient(
+            to bottom,
+            rgba(140, 200, 255, 0.045) 0 1px,
+            transparent 1px 3px
+          ),
+          linear-gradient(180deg, #12243a, var(--lcd));
+        color: var(--lcd-text);
+        font-family: var(--read-font);
+        font-size: 15px;
+        line-height: 1.5;
+        box-shadow:
+          inset 0 0 0 1px rgba(150, 200, 235, 0.22),
+          inset 0 10px 18px rgba(0, 0, 0, 0.28),
+          0 1px 0 rgba(255, 255, 255, 0.55);
+      }
+
+      .lcd p {
+        margin: 0;
+      }
+
+      .lcd p + p {
+        margin-top: 8px;
+        color: var(--lcd-dim);
+      }
+
+      .downloads {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .download {
+        display: grid;
+        gap: 4px;
+        min-height: 74px;
+        padding: 12px 14px;
+        border-radius: 8px;
+        text-decoration: none;
+      }
+
+      .download strong,
+      .download span {
+        display: block;
+      }
+
+      .download strong {
+        font-size: 13px;
+        font-weight: 400;
+        letter-spacing: 0.06em;
+        line-height: 1.25;
+        text-transform: uppercase;
+      }
+
+      .download span {
+        font-family: var(--read-font);
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0;
+        text-transform: none;
+        line-height: 1.35;
+      }
+
+      .download.mac {
+        border: 1px solid #d7f1ff;
+        background:
+          radial-gradient(
+            circle at 50% 0%,
+            rgba(255, 255, 255, 0.85),
+            transparent 42%
+          ),
+          linear-gradient(180deg, #b5e4ff 0%, #3f93d8 46%, #1a62b0 100%);
+        color: #04243c;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.9),
+          0 2px 0 #13467c,
+          0 5px 10px rgba(16, 40, 70, 0.28);
+      }
+
+      .download.windows {
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        background: linear-gradient(
+          180deg,
+          var(--metal-hi) 0%,
+          var(--metal-mid) 48%,
+          var(--metal-lo) 100%
+        );
+        color: var(--ink);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.9),
+          0 2px 0 #6d747c;
+      }
+
+      .download:hover {
+        filter: brightness(1.06);
+      }
+
+      .download:active {
+        transform: translateY(1px);
+      }
+
+      .download:focus-visible {
+        outline: 2px solid #7ec8f5;
+        outline-offset: 2px;
+      }
+
+      .fine {
+        margin: 12px 0 0;
+        color: var(--muted);
+        font-family: var(--read-font);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .support {
+        margin: 16px 0 4px;
+        text-align: center;
+        font-family: var(--read-font);
+        font-size: 13px;
+      }
+
+      .support a {
+        color: #1768a4;
+        font-weight: 700;
+      }
+
+      @media (min-width: 561px) {
+        body {
+          display: flex;
+          min-height: 100dvh;
+        }
+
+        .deck {
+          width: min(100% - 80px, 860px);
+          margin: auto;
+          padding: 30px 36px 34px;
+        }
+
+        .aurora {
+          height: 9px;
+          margin: -30px -36px 24px;
+        }
+
+        .brand {
+          gap: 22px;
+        }
+
+        .brand img {
+          width: 112px;
+          height: 112px;
+        }
+
+        .eyebrow {
+          font-size: 13px;
+        }
+
+        h1 {
+          font-size: 52px;
+        }
+
+        .status {
+          margin-top: 10px;
+          padding: 4px 10px 4px 8px;
+          font-size: 12px;
+        }
+
+        .status-dot {
+          width: 9px;
+          height: 9px;
+        }
+
+        .lcd {
+          margin-top: 26px;
+          padding: 20px 22px;
+          font-size: 18px;
+        }
+
+        .downloads {
+          gap: 14px;
+          margin-top: 20px;
+        }
+
+        .download {
+          min-height: 96px;
+          padding: 16px 18px;
+        }
+
+        .download strong {
+          font-size: 16px;
+        }
+
+        .download span {
+          font-size: 14px;
+        }
+
+        .fine {
+          margin-top: 16px;
+          font-size: 14px;
+        }
+
+        .support {
+          margin: 22px 0 8px;
+          font-size: 16px;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .deck {
+          margin: 20px auto;
+          padding: 16px 16px 18px;
+        }
+
+        .aurora {
+          margin: -16px -16px 14px;
+        }
+
+        .brand img {
+          width: 68px;
+          height: 68px;
+        }
+
+        .brand {
+          align-items: flex-start;
+        }
+
+        h1 {
+          font-size: 22px;
+          letter-spacing: 0.04em;
+        }
+
+        .download strong {
+          font-family: var(--read-font);
+          font-size: 15px;
+          font-weight: 700;
+          letter-spacing: 0;
+          text-transform: none;
+        }
+
+        .downloads {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sky" aria-hidden="true"></div>
+    <main class="deck">
+      <div class="aurora" aria-hidden="true"></div>
+      <span class="rivet" aria-hidden="true"></span>
+      <span class="rivet" aria-hidden="true"></span>
+      <span class="rivet" aria-hidden="true"></span>
+      <span class="rivet" aria-hidden="true"></span>
+
+      <header class="brand">
+        <img src="icon.png" alt="" width="84" height="84" />
+        <div>
+          <p class="eyebrow">LOCAL TELEPROMPTER</p>
+          <h1>ClearCue</h1>
+          <p class="status"><span class="status-dot"></span> Free · 1.0.0</p>
+        </div>
+      </header>
+
+      <section class="lcd">
+        <p>A script that floats above your screen and stays off the share.</p>
+        <p>
+          Paste your words, press start, and share only the window or browser
+          tab you are presenting. ClearCue stays on your side of the call.
+        </p>
+      </section>
+
+      <nav class="downloads" aria-label="Download ClearCue">
+        <a
+          class="download mac"
+          href="https://github.com/christiancruuz/ClearCue/releases/download/v1.0.0/ClearCue-1.0.0-universal.dmg"
+        >
+          <strong>Download for Mac</strong>
+          <span>macOS 13 or later. Apple silicon and Intel. 229 MB.</span>
+        </a>
+        <a
+          class="download windows"
+          href="https://github.com/christiancruuz/ClearCue/releases/download/v1.0.0/ClearCue.Setup.1.0.0.exe"
+        >
+          <strong>Download for Windows</strong>
+          <span>Windows 10 or 11, 64-bit. 107 MB.</span>
+        </a>
+      </nav>
+
+      <p class="fine">
+        On a Mac, open the DMG and drag ClearCue to Applications. On Windows,
+        run the installer. If SmartScreen appears, choose More info, then Run
+        anyway.
+      </p>
+
+      <p class="support">
+        ClearCue is free, but you can
+        <a href="https://buymeacoffee.com/kihongo">buy me a coffee :D</a>
+      </p>
+    </main>
+  </body>
+</html>
