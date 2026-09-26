@@ -28,7 +28,7 @@
       "target": [
         "dmg"
       ],
-      "identity": "Developer ID Application: Christian Cruz Godoy (F536MEQN3T)",
+      "identity": "Christian Cruz Godoy (F536MEQN3T)",
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "build/entitlements.mac.plist",
