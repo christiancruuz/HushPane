@@ -5,7 +5,10 @@ const {
   globalShortcut,
   ipcMain,
   screen,
+  shell,
 } = require("electron");
+
+const SUPPORT_URL = "https://buymeacoffee.com/kihongo";
 
 app.setName("ClearCue");
 app.setPath("userData", path.join(app.getPath("appData"), "ClearCue"));
@@ -13,6 +16,7 @@ app.setPath("userData", path.join(app.getPath("appData"), "ClearCue"));
 let controllerWindow;
 let prompterWindow;
 let clickThrough = false;
+let pinTimer;
 
 const state = {
   text: "Welcome to ClearCue.\n\nPaste your script into the control window, position this prompt near your camera, and share only your presentation window or browser tab.\n\nUse the global shortcut to pause or resume while another app is focused.",
@@ -37,6 +41,40 @@ function broadcastState() {
   send("prompter:state", { ...state, clickThrough });
 }
 
+function pinPrompterAboveFullscreen() {
+  if (!prompterWindow || prompterWindow.isDestroyed() || !state.visible) return;
+
+  // Default always-on-top is "floating", which native fullscreen windows cover.
+  // screen-saver is high enough to stack above Keynote, browsers, and similar.
+  prompterWindow.setAlwaysOnTop(true, "screen-saver", 1);
+
+  if (process.platform === "darwin" || process.platform === "linux") {
+    prompterWindow.setVisibleOnAllWorkspaces(true, {
+      visibleOnFullScreen: true,
+      skipTransformProcessType: true,
+    });
+  }
+
+  if (process.platform === "darwin") {
+    prompterWindow.setFullScreenable(false);
+  }
+
+  prompterWindow.moveTop();
+}
+
+function schedulePinPrompter() {
+  pinPrompterAboveFullscreen();
+  clearTimeout(pinTimer);
+  // macOS Space transitions finish after the fullscreen animation.
+  pinTimer = setTimeout(pinPrompterAboveFullscreen, 500);
+}
+
+function showPrompter() {
+  if (!prompterWindow || prompterWindow.isDestroyed()) return;
+  prompterWindow.showInactive();
+  schedulePinPrompter();
+}
+
 function createPrompterWindow() {
   const workArea = screen.getPrimaryDisplay().workArea;
   const width = Math.min(980, Math.max(620, workArea.width - 160));
@@ -57,6 +95,8 @@ function createPrompterWindow() {
     fullscreenable: false,
     hasShadow: false,
     show: false,
+    acceptFirstMouse: true,
+    ...(process.platform === "darwin" ? { type: "panel" } : {}),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
@@ -65,8 +105,7 @@ function createPrompterWindow() {
     },
   });
 
-  prompterWindow.setAlwaysOnTop(true);
-  prompterWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  pinPrompterAboveFullscreen();
 
   // Windows uses WDA_EXCLUDEFROMCAPTURE. macOS support is best effort only.
   if (process.platform === "win32" || process.platform === "darwin") {
@@ -76,7 +115,7 @@ function createPrompterWindow() {
   prompterWindow.setIgnoreMouseEvents(clickThrough, { forward: true });
   prompterWindow.loadFile(path.join(__dirname, "prompter.html"));
   prompterWindow.once("ready-to-show", () => {
-    prompterWindow.showInactive();
+    showPrompter();
     broadcastState();
   });
 
@@ -103,6 +142,7 @@ function createControllerWindow() {
   });
 
   controllerWindow.setMenuBarVisibility(false);
+  openSupportLinksExternally(controllerWindow.webContents);
   controllerWindow.loadFile(path.join(__dirname, "controller.html"));
   controllerWindow.once("ready-to-show", () => {
     controllerWindow.show();
@@ -114,6 +154,19 @@ function createControllerWindow() {
     if (prompterWindow && !prompterWindow.isDestroyed()) {
       prompterWindow.close();
     }
+  });
+}
+
+function openSupportLinksExternally(contents) {
+  contents.setWindowOpenHandler(({ url }) => {
+    if (url === SUPPORT_URL) shell.openExternal(url);
+    return { action: "deny" };
+  });
+
+  contents.on("will-navigate", (event, url) => {
+    if (url !== SUPPORT_URL) return;
+    event.preventDefault();
+    shell.openExternal(url);
   });
 }
 
@@ -134,7 +187,7 @@ function registerShortcuts() {
     ["CommandOrControl+Shift+R", () => send("prompter:reset")],
     ["CommandOrControl+Shift+H", () => {
       state.visible = !state.visible;
-      if (state.visible) prompterWindow?.showInactive();
+      if (state.visible) showPrompter();
       else prompterWindow?.hide();
       broadcastState();
     }],
@@ -162,7 +215,7 @@ ipcMain.on("prompter:update", (_event, patch) => {
   }
 
   if (Object.hasOwn(patch, "visible")) {
-    if (state.visible) prompterWindow?.showInactive();
+    if (state.visible) showPrompter();
     else prompterWindow?.hide();
   }
 
@@ -172,7 +225,7 @@ ipcMain.on("prompter:update", (_event, patch) => {
 ipcMain.on("prompter:set-click-through", (_event, enabled) => {
   clickThrough = Boolean(enabled);
   prompterWindow?.setIgnoreMouseEvents(clickThrough, { forward: true });
-  if (!clickThrough) prompterWindow?.show();
+  if (!clickThrough) showPrompter();
   broadcastState();
 });
 
@@ -185,9 +238,14 @@ app.whenReady().then(() => {
   createControllerWindow();
   registerShortcuts();
 
+  screen.on("display-metrics-changed", schedulePinPrompter);
+  app.on("did-resign-active", schedulePinPrompter);
+  app.on("browser-window-blur", schedulePinPrompter);
+
   app.on("activate", () => {
     if (!controllerWindow) createControllerWindow();
     if (!prompterWindow) createPrompterWindow();
+    else schedulePinPrompter();
   });
 });
 

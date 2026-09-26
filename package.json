@@ -6,12 +6,37 @@
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
-    "check": "node --check src/main.js && node --check src/preload.js && node --check src/controller.js && node --check src/prompter.js"
+    "check": "node --check src/main.js && node --check src/preload.js && node --check src/controller.js && node --check src/prompter.js",
+    "dist:mac": "electron-builder --mac dmg"
   },
   "engines": {
     "node": ">=22.12.0"
   },
   "devDependencies": {
-    "electron": "^44.1.1"
+    "electron": "^44.1.1",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.kihongo.clearcue",
+    "productName": "ClearCue",
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": [
+        "dmg"
+      ],
+      "identity": "Developer ID Application: Christian Cruz Godoy (F536MEQN3T)",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "notarize": true
+    },
+    "dmg": {
+      "title": "ClearCue"
+    }
   }
 }

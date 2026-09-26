@@ -39,6 +39,12 @@ header {
   margin-bottom: 22px;
 }
 
+.header-meta {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+}
+
 .eyebrow {
   margin: 0 0 3px;
   color: #9da3b4;
@@ -224,6 +230,18 @@ footer {
 
 footer p {
   margin: 0;
+}
+
+.coffee {
+  color: #f5c26b;
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.coffee:hover,
+.coffee:focus-visible {
+  text-decoration: underline;
 }
 
 kbd {

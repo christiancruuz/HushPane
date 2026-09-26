@@ -23,6 +23,10 @@ npm start
 4. Paste your script into the ClearCue control window and press
    **Start prompting**.
 
+The prompt stays stacked above native fullscreen windows, such as a slideshow
+or a browser in full screen. Exclusive fullscreen used by some games and video
+players can still cover it.
+
 ## Shortcuts
 
 - `Command/Ctrl + Shift + Space`: pause or resume
@@ -47,3 +51,8 @@ scrolling until turned off.
 For all operating systems, sharing only the presentation window or browser tab
 is the dependable workflow. Always conduct a private test call before an
 important presentation.
+
+## Support
+
+ClearCue is free. If it helps you, you can
+[buy me a coffee](https://buymeacoffee.com/kihongo).
